@@ -1,0 +1,103 @@
+
+import pygame
+import random
+
+# initialize pygame
+pygame.init()
+
+# set game window dimensions
+window_width = 640
+window_height = 480
+window = pygame.display.set_mode((window_width, window_height))
+
+# set game title
+pygame.display.set_caption("Snake Game")
+
+# set clock for controlling game speed
+clock = pygame.time.Clock()
+
+# set font for displaying text
+font = pygame.font.Font(None, 30)
+
+# set snake properties
+snake_size = 10
+snake_speed = 5
+snake_color = (0, 255, 0)
+
+# set food properties
+food_size = 10
+food_color = (255, 0, 0)
+
+# set initial snake position and direction
+snake_x = window_width / 2
+snake_y = window_height / 2
+snake_dx = 0
+snake_dy = 0
+
+# create list for storing snake body segments
+snake_segments = []
+
+# set initial score and game status
+score = 0
+game_over = False
+
+# define function for creating new food
+def create_food():
+    food_x = random.randint(0, window_width - food_size)
+    food_y = random.randint(0, window_height - food_size)
+    return food_x, food_y
+
+# create initial food position
+food_x, food_y = create_food()
+
+# set game loop
+while not game_over:
+
+    # handle events
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            game_over = True
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_UP:
+                snake_dx = 0
+                snake_dy = -snake_size
+            elif event.key == pygame.K_DOWN:
+                snake_dx = 0
+                snake_dy = snake_size
+            elif event.key == pygame.K_LEFT:
+                snake_dx = -snake_size
+                snake_dy = 0
+            elif event.key == pygame.K_RIGHT:
+                snake_dx = snake_size
+                snake_dy = 0
+    
+    # move snake
+    snake_x += snake_dx
+    snake_y += snake_dy
+    
+    # check if snake hits the edges
+    if snake_x < 0 or snake_x >= window_width or snake_y < 0 or snake_y >= window_height:
+        game_over = True
+    
+    # check if snake hits the food
+    if snake_x < food_x + food_size and snake_x + snake_size > food_x and snake_y < food_y + food_size and snake_y + snake_size > food_y:
+        food_x, food_y = create_food()
+        score += 1
+        snake_speed += 1
+        segment_x = snake_x
+        segment_y = snake_y
+        snake_segments.append((segment_x, segment_y))
+    
+    # check if snake hits its own body
+    for segment in snake_segments:
+        if snake_x < segment[0] + snake_size and snake_x + snake_size > segment[0] and snake_y < segment[1] + snake_size and snake_y + snake_size > segment[1]:
+            game_over = True
+    
+    # add new snake segment to the list
+    segment_x = snake_x
+    segment_y = snake_y
+    snake_segments.append((segment_x, segment_y))
+    
+    # remove oldest snake segment if the list is too long
+    if len(snake_segments) > score + 1:
+        del snake
